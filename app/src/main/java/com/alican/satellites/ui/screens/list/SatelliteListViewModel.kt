@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SatelliteListViewModel(
@@ -21,23 +22,39 @@ class SatelliteListViewModel(
         observeSearch()
     }
 
+    fun screenEvent(event: SatelliteListUIEvent) {
+        when (event) {
+            SatelliteListUIEvent.RetryClicked -> retry()
+            is SatelliteListUIEvent.SearchQueryChanged -> onSearchQueryChanged(event.query)
+        }
+    }
+
     private fun loadSatellites() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
 
             satelliteListInteractor.getSatellites()
                 .onSuccess { satellites ->
                     satelliteListInteractor.updateSatellitesList(satellites)
-                    _uiState.value = _uiState.value.copy(
-                        satellites = satellites,
-                        isLoading = false
-                    )
+                    _uiState.update {
+                        it.copy(
+                            satellites = satellites,
+                            isLoading = false
+                        )
+                    }
                 }
                 .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = "Failed to load satellites: ${exception.message}"
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to load satellites: ${exception.message}"
+                        )
+                    }
                 }
         }
     }
@@ -50,19 +67,21 @@ class SatelliteListViewModel(
             ) { query, filtered ->
                 query to filtered
             }.collect { (query, filtered) ->
-                _uiState.value = _uiState.value.copy(
-                    searchQuery = query,
-                    filteredSatellites = filtered
-                )
+                _uiState.update {
+                    it.copy(
+                        searchQuery = query,
+                        filteredSatellites = filtered
+                    )
+                }
             }
         }
     }
 
-    fun onSearchQueryChanged(query: String) {
+    private fun onSearchQueryChanged(query: String) {
         satelliteListInteractor.updateSearchQuery(query)
     }
 
-    fun retry() {
+    private fun retry() {
         loadSatellites()
     }
 }

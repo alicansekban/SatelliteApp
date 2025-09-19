@@ -29,6 +29,12 @@ class SatelliteDetailViewModel(
         startPositionUpdates()
     }
 
+    fun screenEvent(event: SatelliteDetailUIEvent) {
+        when (event) {
+            SatelliteDetailUIEvent.ClearError -> clearError()
+            SatelliteDetailUIEvent.RetryClicked -> retry()
+        }
+    }
     private fun loadSatelliteData() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
@@ -94,12 +100,12 @@ class SatelliteDetailViewModel(
         }
     }
 
-    fun retry() {
+    private fun retry() {
         loadSatelliteData()
         startPositionUpdates()
     }
 
-    fun clearError() {
+    private fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
 

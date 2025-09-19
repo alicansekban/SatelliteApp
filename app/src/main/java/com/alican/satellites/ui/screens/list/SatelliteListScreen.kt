@@ -31,8 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.alican.satellites.data.model.Satellite
+import com.alican.satellites.ui.theme.SatellitesTheme
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +53,9 @@ fun SatelliteListScreen(
         // Search Bar
         OutlinedTextField(
             value = uiState.searchQuery,
-            onValueChange = viewModel::onSearchQueryChanged,
+            onValueChange = { query ->
+                viewModel.screenEvent(SatelliteListUIEvent.SearchQueryChanged(query = query.trim()))
+            },
             label = { Text("Search satellites") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             modifier = Modifier
@@ -96,7 +100,9 @@ fun SatelliteListScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
-                            onClick = viewModel::retry
+                            onClick = {
+                                viewModel.screenEvent(event = SatelliteListUIEvent.RetryClicked)
+                            }
                         ) {
                             Text("Retry")
                         }
@@ -192,5 +198,210 @@ private fun SatelliteListItem(
                 }
             }
         }
+    }
+}
+
+// Preview Components for different states
+@Composable
+private fun SatelliteListScreenPreview(
+    uiState: SatelliteListUiState,
+    onNavigateToDetail: (Int) -> Unit = {},
+    onSearchQueryChanged: (String) -> Unit = {},
+    onRetry: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Search Bar
+        OutlinedTextField(
+            value = uiState.searchQuery,
+            onValueChange = onSearchQueryChanged,
+            label = { Text("Search satellites") },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            singleLine = true
+        )
+
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Loading satellites...",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+
+            uiState.error != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = uiState.error,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = onRetry) {
+                            Text("Retry")
+                        }
+                    }
+                }
+            }
+
+            uiState.filteredSatellites.isEmpty() && uiState.searchQuery.isNotBlank() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No satellites found for \"${uiState.searchQuery}\"",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+            else -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = uiState.filteredSatellites,
+                        key = { it.id }
+                    ) { satellite ->
+                        SatelliteListItem(
+                            satellite = satellite,
+                            onClick = { onNavigateToDetail(satellite.id) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Preview Data
+private val previewSatellites = listOf(
+    Satellite(id = 1, name = "Starship-1", active = true),
+    Satellite(id = 2, name = "Dragon", active = false),
+    Satellite(id = 3, name = "Falcon Heavy", active = true),
+    Satellite(id = 4, name = "Starship-10", active = true),
+    Satellite(id = 5, name = "Crew Dragon", active = false),
+)
+
+@Preview(showBackground = true, name = "Satellite List - Loaded State")
+@Composable
+private fun SatelliteListScreenLoadedPreview() {
+    SatellitesTheme {
+        SatelliteListScreenPreview(
+            uiState = SatelliteListUiState(
+                satellites = previewSatellites,
+                filteredSatellites = previewSatellites,
+                isLoading = false,
+                searchQuery = "",
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite List - Loading State")
+@Composable
+private fun SatelliteListScreenLoadingPreview() {
+    SatellitesTheme {
+        SatelliteListScreenPreview(
+            uiState = SatelliteListUiState(
+                isLoading = true
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite List - Error State")
+@Composable
+private fun SatelliteListScreenErrorPreview() {
+    SatellitesTheme {
+        SatelliteListScreenPreview(
+            uiState = SatelliteListUiState(
+                isLoading = false,
+                error = "Failed to load satellites: Network connection error"
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite List - Search No Results")
+@Composable
+private fun SatelliteListScreenNoResultsPreview() {
+    SatellitesTheme {
+        SatelliteListScreenPreview(
+            uiState = SatelliteListUiState(
+                satellites = previewSatellites,
+                filteredSatellites = emptyList(),
+                isLoading = false,
+                searchQuery = "Tesla",
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite List - Search Results")
+@Composable
+private fun SatelliteListScreenSearchResultsPreview() {
+    SatellitesTheme {
+        SatelliteListScreenPreview(
+            uiState = SatelliteListUiState(
+                satellites = previewSatellites,
+                filteredSatellites = listOf(
+                    Satellite(id = 1, name = "Starship-1", active = true),
+                    Satellite(id = 4, name = "Starship-10", active = true)
+                ),
+                isLoading = false,
+                searchQuery = "Starship",
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite List Item - Active")
+@Composable
+private fun SatelliteListItemActivePreview() {
+    SatellitesTheme {
+        SatelliteListItem(
+            satellite = Satellite(id = 1, name = "Starship-1", active = true),
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite List Item - Inactive")
+@Composable
+private fun SatelliteListItemInactivePreview() {
+    SatellitesTheme {
+        SatelliteListItem(
+            satellite = Satellite(id = 2, name = "Dragon", active = false),
+            onClick = {}
+        )
     }
 }

@@ -1,6 +1,6 @@
-
 package com.alican.satellites.ui.screens.detail
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,10 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.alican.satellites.data.model.Position
 import com.alican.satellites.data.model.Satellite
 import com.alican.satellites.data.model.SatelliteDetail
+import com.alican.satellites.ui.theme.SatellitesTheme
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,8 +85,7 @@ fun SatelliteDetailScreen(
             uiState.error != null -> {
                 ErrorContent(
                     error = uiState.error.orEmpty(),
-                    onRetry = viewModel::retry,
-                    onClearError = viewModel::clearError,
+                    onEvent = viewModel::screenEvent,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -130,10 +131,9 @@ private fun LoadingContent(
 
 @Composable
 private fun ErrorContent(
+    modifier: Modifier = Modifier,
     error: String,
-    onRetry: () -> Unit,
-    onClearError: () -> Unit,
-    modifier: Modifier = Modifier
+    onEvent: (SatelliteDetailUIEvent) -> Unit = {},
 ) {
     Box(
         modifier = modifier,
@@ -170,15 +170,19 @@ private fun ErrorContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
-                        onClick = onClearError,
+                        onClick = {
+                            onEvent(SatelliteDetailUIEvent.ClearError)
+                        },
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
                         )
                     ) {
-                        Text("Dismiss")
+                        Text("Go Back")
                     }
                     Button(
-                        onClick = onRetry,
+                        onClick = {
+                            onEvent(SatelliteDetailUIEvent.RetryClicked)
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.onErrorContainer,
                             contentColor = MaterialTheme.colorScheme.errorContainer
@@ -279,6 +283,7 @@ private fun SatelliteBasicInfoCard(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun SatellitePositionCard(
     position: Position?,
@@ -316,8 +321,9 @@ private fun SatellitePositionCard(
                                 colors = CardDefaults.cardColors(
                                     containerColor = Color.Green
                                 ),
-                                modifier = Modifier.fillMaxSize()
-                            ) {}
+                                modifier = Modifier.fillMaxSize(),
+                                content = {}
+                            )
                         }
                         Text(
                             text = "Live",
@@ -393,6 +399,7 @@ private fun PositionItem(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun SatelliteDetailInfoCard(
     satelliteDetail: SatelliteDetail?,
@@ -511,6 +518,241 @@ private fun DetailInfoRow(
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+// Preview Components for different states
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SatelliteDetailScreenPreview(
+    uiState: SatelliteDetailUiState,
+    onBackClicked: () -> Unit = {},
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = uiState.satellite?.name ?: "Satellite Detail",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClicked) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        when {
+            uiState.isLoading -> {
+                LoadingContent(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                )
+            }
+
+            uiState.error != null -> {
+                ErrorContent(
+                    error = uiState.error,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                )
+            }
+
+            uiState.satellite != null -> {
+                SatelliteDetailContent(
+                    satellite = uiState.satellite,
+                    satelliteDetail = uiState.satelliteDetail,
+                    currentPosition = uiState.currentPosition,
+                    isLoadingDetail = uiState.isLoadingDetail,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                )
+            }
+        }
+    }
+}
+
+// Preview Data
+private val previewSatellite = Satellite(id = 1, name = "Starship-1", active = true)
+private val previewInactiveSatellite = Satellite(id = 2, name = "Dragon", active = false)
+private val previewPosition = Position(posX = 0.864328541, posY = 0.646450811)
+private val previewSatelliteDetail = SatelliteDetail(
+    id = 1,
+    cost_per_launch = 7200000,
+    first_flight = "2006-03-24",
+    height = 22,
+    mass = 30146
+)
+
+@Preview(showBackground = true, name = "Satellite Detail - Complete Data")
+@Composable
+private fun SatelliteDetailScreenCompletePreview() {
+    SatellitesTheme {
+        SatelliteDetailScreenPreview(
+            uiState = SatelliteDetailUiState(
+                satellite = previewSatellite,
+                satelliteDetail = previewSatelliteDetail,
+                currentPosition = previewPosition,
+                isLoading = false,
+                isLoadingDetail = false,
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite Detail - Loading State")
+@Composable
+private fun SatelliteDetailScreenLoadingPreview() {
+    SatellitesTheme {
+        SatelliteDetailScreenPreview(
+            uiState = SatelliteDetailUiState(
+                satellite = null,
+                isLoading = true,
+                isLoadingDetail = false,
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite Detail - Error State")
+@Composable
+private fun SatelliteDetailScreenErrorPreview() {
+    SatellitesTheme {
+        SatelliteDetailScreenPreview(
+            uiState = SatelliteDetailUiState(
+                satellite = null,
+                isLoading = false,
+                isLoadingDetail = false,
+                error = "Failed to load satellite: Satellite with id 999 not found"
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite Detail - Loading Details")
+@Composable
+private fun SatelliteDetailScreenLoadingDetailsPreview() {
+    SatellitesTheme {
+        SatelliteDetailScreenPreview(
+            uiState = SatelliteDetailUiState(
+                satellite = previewSatellite,
+                satelliteDetail = null,
+                currentPosition = previewPosition,
+                isLoading = false,
+                isLoadingDetail = true,
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite Detail - No Position Data")
+@Composable
+private fun SatelliteDetailScreenNoPositionPreview() {
+    SatellitesTheme {
+        SatelliteDetailScreenPreview(
+            uiState = SatelliteDetailUiState(
+                satellite = previewInactiveSatellite,
+                satelliteDetail = previewSatelliteDetail,
+                currentPosition = null,
+                isLoading = false,
+                isLoadingDetail = false,
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Satellite Detail - No Detail Data")
+@Composable
+private fun SatelliteDetailScreenNoDetailPreview() {
+    SatellitesTheme {
+        SatelliteDetailScreenPreview(
+            uiState = SatelliteDetailUiState(
+                satellite = previewSatellite,
+                satelliteDetail = null,
+                currentPosition = previewPosition,
+                isLoading = false,
+                isLoadingDetail = false,
+                error = null
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Basic Info Card - Active")
+@Composable
+private fun SatelliteBasicInfoCardActivePreview() {
+    SatellitesTheme {
+        SatelliteBasicInfoCard(satellite = previewSatellite)
+    }
+}
+
+@Preview(showBackground = true, name = "Basic Info Card - Inactive")
+@Composable
+private fun SatelliteBasicInfoCardInactivePreview() {
+    SatellitesTheme {
+        SatelliteBasicInfoCard(satellite = previewInactiveSatellite)
+    }
+}
+
+@Preview(showBackground = true, name = "Position Card - With Data")
+@Composable
+private fun SatellitePositionCardWithDataPreview() {
+    SatellitesTheme {
+        SatellitePositionCard(position = previewPosition)
+    }
+}
+
+@Preview(showBackground = true, name = "Position Card - No Data")
+@Composable
+private fun SatellitePositionCardNoDataPreview() {
+    SatellitesTheme {
+        SatellitePositionCard(position = null)
+    }
+}
+
+@Preview(showBackground = true, name = "Detail Info Card - With Data")
+@Composable
+private fun SatelliteDetailInfoCardWithDataPreview() {
+    SatellitesTheme {
+        SatelliteDetailInfoCard(
+            satelliteDetail = previewSatelliteDetail,
+            isLoading = false
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Detail Info Card - Loading")
+@Composable
+private fun SatelliteDetailInfoCardLoadingPreview() {
+    SatellitesTheme {
+        SatelliteDetailInfoCard(
+            satelliteDetail = null,
+            isLoading = true
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Detail Info Card - No Data")
+@Composable
+private fun SatelliteDetailInfoCardNoDataPreview() {
+    SatellitesTheme {
+        SatelliteDetailInfoCard(
+            satelliteDetail = null,
+            isLoading = false
         )
     }
 }

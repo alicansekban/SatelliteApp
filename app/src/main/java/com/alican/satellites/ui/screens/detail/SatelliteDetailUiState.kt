@@ -4,6 +4,10 @@ import com.alican.satellites.data.model.Position
 import com.alican.satellites.data.model.Satellite
 import com.alican.satellites.data.model.SatelliteDetail
 
+sealed interface SatelliteDetailUIEvent {
+    data object RetryClicked : SatelliteDetailUIEvent
+    data object ClearError : SatelliteDetailUIEvent
+}
 data class SatelliteDetailUiState(
     val satellite: Satellite? = null,
     val satelliteDetail: SatelliteDetail? = null,
