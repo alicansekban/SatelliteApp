@@ -7,6 +7,7 @@ import com.alican.satellites.data.local.entity.toSatelliteDetail
 import com.alican.satellites.data.model.Satellite
 import com.alican.satellites.data.model.SatelliteDetail
 import com.alican.satellites.data.model.SatellitePosition
+import com.alican.satellites.data.model.SatellitePositionResponse
 import com.alican.satellites.extensions.loadJSONFromAssets
 import com.alican.satellites.utils.AppConstants
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,6 @@ interface SatelliteRepository {
     suspend fun getSatellitePositions(): List<SatellitePosition>
 }
 
-
 class SatelliteRepositoryImpl(
     private val context: Context,
     private val satelliteDetailDao: SatelliteDetailDao
@@ -34,12 +34,8 @@ class SatelliteRepositoryImpl(
     }
 
     override suspend fun getSatellites(): List<Satellite> = withContext(Dispatchers.IO) {
-        try {
-            val jsonString = context.loadJSONFromAssets(AppConstants.SATELLITES_DATA_FILENAME)
-            json.decodeFromString<List<Satellite>>(jsonString)
-        } catch (e: Exception) {
-            emptyList()
-        }
+        val jsonString = context.loadJSONFromAssets(AppConstants.SATELLITES_DATA_FILENAME)
+        json.decodeFromString<List<Satellite>>(jsonString)
     }
 
     override suspend fun getSatelliteDetail(satelliteId: Int): SatelliteDetail? =
@@ -51,30 +47,22 @@ class SatelliteRepositoryImpl(
             }
 
             // If not in cache, load from assets
-            try {
-                val jsonString = context.loadJSONFromAssets(AppConstants.SATELLITE_DETAIL_FILENAME)
-                val details = json.decodeFromString<List<SatelliteDetail>>(jsonString)
-                val detail = details.find { it.id == satelliteId }
+            val jsonString = context.loadJSONFromAssets(AppConstants.SATELLITE_DETAIL_FILENAME)
+            val details = json.decodeFromString<List<SatelliteDetail>>(jsonString)
+            val detail = details.find { it.id == satelliteId }
 
-                // Cache the detail
-                detail?.let {
-                    satelliteDetailDao.insertSatelliteDetail(it.toEntity())
-                }
-
-                detail
-            } catch (e: Exception) {
-                null
+            // Cache the detail
+            detail?.let {
+                satelliteDetailDao.insertSatelliteDetail(it.toEntity())
             }
+
+            detail
         }
 
     override suspend fun getSatellitePositions(): List<SatellitePosition> =
         withContext(Dispatchers.IO) {
-            try {
-                val jsonString =
-                    context.loadJSONFromAssets(AppConstants.SATELLITE_POSITIONS_FILENAME)
-                json.decodeFromString<List<SatellitePosition>>(jsonString)
-            } catch (e: Exception) {
-                emptyList()
-            }
+            val jsonString = context.loadJSONFromAssets(AppConstants.SATELLITE_POSITIONS_FILENAME)
+            val response = json.decodeFromString<SatellitePositionResponse>(jsonString)
+            response.list
         }
 }

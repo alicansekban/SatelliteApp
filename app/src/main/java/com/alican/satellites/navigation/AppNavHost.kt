@@ -2,7 +2,6 @@ package com.alican.satellites.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,11 +19,20 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable<ScreenRoutes.SatelliteList> {
-            SatelliteListScreen()
+            SatelliteListScreen(
+                onNavigateToDetail = { id ->
+                    val route = ScreenRoutes.SatelliteDetail(id = id)
+                    navController.navigate(route = route)
+                }
+            )
         }
 
         composable<ScreenRoutes.SatelliteDetail> {
-            SatelliteDetailScreen()
+            SatelliteDetailScreen(
+                onBackClicked = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

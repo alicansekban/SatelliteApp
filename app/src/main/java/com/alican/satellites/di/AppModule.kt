@@ -4,6 +4,12 @@ import androidx.room.Room
 import com.alican.satellites.data.local.SatelliteDatabase
 import com.alican.satellites.data.repository.SatelliteRepository
 import com.alican.satellites.data.repository.SatelliteRepositoryImpl
+import com.alican.satellites.domain.interactor.SatelliteDetailInteractor
+import com.alican.satellites.domain.interactor.SatelliteDetailInteractorImpl
+import com.alican.satellites.domain.interactor.SatelliteListInteractor
+import com.alican.satellites.domain.interactor.SatelliteListInteractorImpl
+import com.alican.satellites.ui.screens.detail.SatelliteDetailViewModel
+import com.alican.satellites.ui.screens.list.SatelliteListViewModel
 import com.alican.satellites.utils.AppConstants
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
@@ -26,4 +32,12 @@ val appModule = module {
 
     // Repository
     singleOf(::SatelliteRepositoryImpl) bind SatelliteRepository::class
+
+    // Interactors
+    singleOf(::SatelliteListInteractorImpl) bind SatelliteListInteractor::class
+    singleOf(::SatelliteDetailInteractorImpl) bind SatelliteDetailInteractor::class
+
+    // ViewModels
+    singleOf(::SatelliteListViewModel)
+    singleOf(::SatelliteDetailViewModel)
 }
