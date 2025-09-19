@@ -42,7 +42,8 @@ fun SatelliteDetailScreen(
     ) {
         SatelliteDetailScreenContent(
             uiState = uiState,
-            onBackClicked = onBackClicked
+            onBackClicked = onBackClicked,
+            onEvent = viewModel::screenEvent,
         )
     }
 }
@@ -51,6 +52,7 @@ fun SatelliteDetailScreen(
 private fun SatelliteDetailScreenContent(
     uiState: SatelliteDetailUiState,
     onBackClicked: () -> Unit = {},
+    onEvent: (SatelliteDetailUIEvent) -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -86,7 +88,8 @@ private fun SatelliteDetailScreenContent(
                     error = uiState.error,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
+                    onEvent = onEvent
                 )
             }
 

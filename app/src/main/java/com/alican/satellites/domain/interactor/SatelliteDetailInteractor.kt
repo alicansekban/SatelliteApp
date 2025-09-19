@@ -1,17 +1,17 @@
+
 package com.alican.satellites.domain.interactor
 
 import com.alican.satellites.data.model.Position
-import com.alican.satellites.data.model.Satellite
-import com.alican.satellites.data.model.SatelliteDetail
 import com.alican.satellites.data.repository.SatelliteRepository
+import com.alican.satellites.domain.model.SatelliteCompleteData
 import com.alican.satellites.utils.AppConstants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
+
 interface SatelliteDetailInteractor {
-    suspend fun getSatelliteById(satelliteId: Int): Result<Satellite>
-    suspend fun getSatelliteDetail(satelliteId: Int): Result<SatelliteDetail?>
+    suspend fun getSatelliteCompleteData(satelliteId: Int): Result<SatelliteCompleteData>
     fun observePositionUpdates(satelliteId: Int): Flow<Result<Position?>>
 }
 
@@ -19,22 +19,22 @@ class SatelliteDetailInteractorImpl(
     private val repository: SatelliteRepository
 ) : SatelliteDetailInteractor {
 
-    override suspend fun getSatelliteById(satelliteId: Int): Result<Satellite> {
+    override suspend fun getSatelliteCompleteData(satelliteId: Int): Result<SatelliteCompleteData> {
         return try {
+            // Get satellite basic info
             val satellites = repository.getSatellites()
             val satellite = satellites.find { it.id == satelliteId }
                 ?: return Result.failure(SatelliteNotFoundException("Satellite with id $satelliteId not found"))
 
-            Result.success(satellite)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+            // Get satellite detail (this handles caching)
+            val satelliteDetail = repository.getSatelliteDetail(satelliteId)
 
-    override suspend fun getSatelliteDetail(satelliteId: Int): Result<SatelliteDetail?> {
-        return try {
-            val detail = repository.getSatelliteDetail(satelliteId)
-            Result.success(detail)
+            val completeData = SatelliteCompleteData(
+                satellite = satellite,
+                satelliteDetail = satelliteDetail
+            )
+
+            Result.success(completeData)
         } catch (e: Exception) {
             Result.failure(e)
         }

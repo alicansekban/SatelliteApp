@@ -1,3 +1,4 @@
+
 package com.alican.satellites.ui.screens.detail
 
 import androidx.lifecycle.SavedStateHandle
@@ -36,6 +37,7 @@ class SatelliteDetailViewModel(
             SatelliteDetailUIEvent.RetryClicked -> retry()
         }
     }
+
     private fun loadSatelliteData() {
         viewModelScope.launch {
             _uiState.update {
@@ -45,17 +47,17 @@ class SatelliteDetailViewModel(
                 )
             }
 
-            // Load satellite basic info
-            satelliteDetailInteractor.getSatelliteById(args.id)
-                .onSuccess { satellite ->
+            // Load all satellite data at once
+            satelliteDetailInteractor.getSatelliteCompleteData(args.id)
+                .onSuccess { completeData ->
                     _uiState.update {
                         it.copy(
-                            satellite = satellite,
-                            isLoading = false
+                            satellite = completeData.satellite,
+                            satelliteDetail = completeData.satelliteDetail,
+                            isLoading = false,
+                            isLoadingDetail = false
                         )
                     }
-                    // Load satellite detail
-                    loadSatelliteDetail()
                 }
                 .onFailure { exception ->
                     val errorMessage = when (exception) {
@@ -66,34 +68,6 @@ class SatelliteDetailViewModel(
                         it.copy(
                             isLoading = false,
                             error = errorMessage
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun loadSatelliteDetail() {
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isLoadingDetail = true
-                )
-            }
-
-            satelliteDetailInteractor.getSatelliteDetail(args.id)
-                .onSuccess { detail ->
-                    _uiState.update {
-                        it.copy(
-                            isLoadingDetail = false,
-                            satelliteDetail = detail
-                        )
-                    }
-                }
-                .onFailure { exception ->
-                    _uiState.update {
-                        it.copy(
-                            isLoadingDetail = false,
-                            error = "Failed to load satellite detail: ${exception.message}"
                         )
                     }
                 }
