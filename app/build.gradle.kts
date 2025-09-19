@@ -65,4 +65,12 @@ dependencies {
 
     // navigation
     implementation(libs.androidx.navigation.compose)
+
+    // serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    // koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.android.compose)
+    implementation(libs.koin.core)
 }
