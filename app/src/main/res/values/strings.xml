@@ -1,3 +1,39 @@
+
 <resources>
     <string name="app_name">Satellites</string>
+
+    <!-- Common strings -->
+    <string name="loading">Loading satellites...</string>
+    <string name="retry">Retry</string>
+    <string name="error">Error</string>
+    <string name="back">Back</string>
+    <string name="go_back">Go Back</string>
+
+    <!-- Satellite List Screen -->
+    <string name="search_satellites">Search satellites</string>
+    <string name="no_satellites_found">No satellites found for \"%1$s\"</string>
+    <string name="satellite_id">ID: %1$d</string>
+
+    <!-- Satellite Detail Screen -->
+    <string name="satellite_detail">Satellite Detail</string>
+    <string name="loading_satellite_details">Loading satellite details…</string>
+    <string name="active">Active</string>
+    <string name="inactive">Inactive</string>
+    <string name="current_position">Current Position</string>
+    <string name="live">Live</string>
+    <string name="x_position">X Position</string>
+    <string name="y_position">Y Position</string>
+    <string name="position_data_not_available">Position data not available</string>
+    <string name="detailed_information">Detailed Information</string>
+    <string name="loading_details">Loading details…</string>
+    <string name="cost_per_launch">Cost per Launch</string>
+    <string name="first_flight">First Flight</string>
+    <string name="height">Height</string>
+    <string name="mass">Mass</string>
+    <string name="detail_information_not_available">Detail information not available</string>
+
+    <!-- Format strings -->
+    <string name="cost_format">$%1$s</string>
+    <string name="height_format">%1$dm</string>
+    <string name="mass_format">%1$s kg</string>
 </resources>

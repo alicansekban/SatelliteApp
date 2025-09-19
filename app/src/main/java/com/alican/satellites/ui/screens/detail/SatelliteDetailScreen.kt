@@ -35,10 +35,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.alican.satellites.R
 import com.alican.satellites.data.model.Position
 import com.alican.satellites.data.model.Satellite
 import com.alican.satellites.data.model.SatelliteDetail
@@ -58,7 +60,7 @@ fun SatelliteDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = uiState.satellite?.name ?: "Satellite Detail",
+                        text = uiState.satellite?.name ?: stringResource(R.string.satellite_detail),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
@@ -66,7 +68,7 @@ fun SatelliteDetailScreen(
                     IconButton(onClick = onBackClicked) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 }
@@ -122,7 +124,7 @@ private fun LoadingContent(
             CircularProgressIndicator()
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Loading satellite details...",
+                text = stringResource(R.string.loading_satellite_details),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -153,7 +155,7 @@ private fun ErrorContent(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Error",
+                    text = stringResource(R.string.error),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     fontWeight = FontWeight.Bold
@@ -177,7 +179,7 @@ private fun ErrorContent(
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
                         )
                     ) {
-                        Text("Go Back")
+                        Text(stringResource(R.string.go_back))
                     }
                     Button(
                         onClick = {
@@ -188,7 +190,7 @@ private fun ErrorContent(
                             contentColor = MaterialTheme.colorScheme.errorContainer
                         )
                     ) {
-                        Text("Retry")
+                        Text(stringResource(R.string.retry))
                     }
                 }
             }
@@ -264,7 +266,7 @@ private fun SatelliteBasicInfoCard(
                         ) {}
                     }
                     Text(
-                        text = if (satellite.active) "Active" else "Inactive",
+                        text = stringResource(if (satellite.active) R.string.active else R.string.inactive),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
@@ -275,7 +277,7 @@ private fun SatelliteBasicInfoCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "ID: ${satellite.id}",
+                text = stringResource(R.string.satellite_id, satellite.id),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -302,7 +304,7 @@ private fun SatellitePositionCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Current Position",
+                    text = stringResource(R.string.current_position),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -326,7 +328,7 @@ private fun SatellitePositionCard(
                             )
                         }
                         Text(
-                            text = "Live",
+                            text = stringResource(R.string.live),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -342,7 +344,7 @@ private fun SatellitePositionCard(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     PositionItem(
-                        label = "X Position",
+                        label = stringResource(R.string.x_position),
                         value = String.format("%.6f", position.posX),
                         modifier = Modifier.weight(1f)
                     )
@@ -350,7 +352,7 @@ private fun SatellitePositionCard(
                     Spacer(modifier = Modifier.width(16.dp))
 
                     PositionItem(
-                        label = "Y Position",
+                        label = stringResource(R.string.y_position),
                         value = String.format("%.6f", position.posY),
                         modifier = Modifier.weight(1f)
                     )
@@ -363,7 +365,7 @@ private fun SatellitePositionCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Position data not available",
+                        text = stringResource(R.string.position_data_not_available),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -414,7 +416,7 @@ private fun SatelliteDetailInfoCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Detailed Information",
+                text = stringResource(R.string.detailed_information),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -439,7 +441,7 @@ private fun SatelliteDetailInfoCard(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Loading details...",
+                                text = stringResource(R.string.loading_details),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -452,23 +454,29 @@ private fun SatelliteDetailInfoCard(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         DetailInfoRow(
-                            label = "Cost per Launch",
-                            value = "$${String.format("%,d", satelliteDetail.cost_per_launch)}"
+                            label = stringResource(R.string.cost_per_launch),
+                            value = stringResource(
+                                R.string.cost_format,
+                                String.format("%,d", satelliteDetail.cost_per_launch)
+                            )
                         )
 
                         DetailInfoRow(
-                            label = "First Flight",
+                            label = stringResource(R.string.first_flight),
                             value = satelliteDetail.first_flight
                         )
 
                         DetailInfoRow(
-                            label = "Height",
-                            value = "${satelliteDetail.height}m"
+                            label = stringResource(R.string.height),
+                            value = stringResource(R.string.height_format, satelliteDetail.height)
                         )
 
                         DetailInfoRow(
-                            label = "Mass",
-                            value = "${String.format("%,d", satelliteDetail.mass)} kg"
+                            label = stringResource(R.string.mass),
+                            value = stringResource(
+                                R.string.mass_format,
+                                String.format("%,d", satelliteDetail.mass)
+                            )
                         )
                     }
                 }
@@ -481,7 +489,7 @@ private fun SatelliteDetailInfoCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Detail information not available",
+                            text = stringResource(R.string.detail_information_not_available),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -534,7 +542,7 @@ private fun SatelliteDetailScreenPreview(
             TopAppBar(
                 title = {
                     Text(
-                        text = uiState.satellite?.name ?: "Satellite Detail",
+                        text = uiState.satellite?.name ?: stringResource(R.string.satellite_detail),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
@@ -542,7 +550,7 @@ private fun SatelliteDetailScreenPreview(
                     IconButton(onClick = onBackClicked) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 }

@@ -30,9 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.alican.satellites.R
 import com.alican.satellites.data.model.Satellite
 import com.alican.satellites.ui.theme.SatellitesTheme
 import org.koin.androidx.compose.koinViewModel
@@ -56,7 +58,7 @@ fun SatelliteListScreen(
             onValueChange = { query ->
                 viewModel.screenEvent(SatelliteListUIEvent.SearchQueryChanged(query = query.trim()))
             },
-            label = { Text("Search satellites") },
+            label = { Text(stringResource(R.string.search_satellites)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -77,7 +79,7 @@ fun SatelliteListScreen(
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Loading satellites...",
+                            text = stringResource(R.string.loading),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -104,7 +106,7 @@ fun SatelliteListScreen(
                                 viewModel.screenEvent(event = SatelliteListUIEvent.RetryClicked)
                             }
                         ) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -116,7 +118,7 @@ fun SatelliteListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No satellites found for \"${uiState.searchQuery}\"",
+                        text = stringResource(R.string.no_satellites_found, uiState.searchQuery),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -171,7 +173,7 @@ private fun SatelliteListItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "ID: ${satellite.id}",
+                    text = stringResource(R.string.satellite_id, satellite.id),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -218,7 +220,7 @@ private fun SatelliteListScreenPreview(
         OutlinedTextField(
             value = uiState.searchQuery,
             onValueChange = onSearchQueryChanged,
-            label = { Text("Search satellites") },
+            label = { Text(stringResource(R.string.search_satellites)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -239,7 +241,7 @@ private fun SatelliteListScreenPreview(
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Loading satellites...",
+                            text = stringResource(R.string.loading),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -262,7 +264,7 @@ private fun SatelliteListScreenPreview(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = onRetry) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -274,7 +276,7 @@ private fun SatelliteListScreenPreview(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No satellites found for \"${uiState.searchQuery}\"",
+                        text = stringResource(R.string.no_satellites_found, uiState.searchQuery),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }

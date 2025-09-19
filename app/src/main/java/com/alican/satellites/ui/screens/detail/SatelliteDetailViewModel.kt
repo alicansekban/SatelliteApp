@@ -11,6 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SatelliteDetailViewModel(
@@ -37,15 +38,22 @@ class SatelliteDetailViewModel(
     }
     private fun loadSatelliteData() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
 
             // Load satellite basic info
             satelliteDetailInteractor.getSatelliteById(args.id)
                 .onSuccess { satellite ->
-                    _uiState.value = _uiState.value.copy(
-                        satellite = satellite,
-                        isLoading = false
-                    )
+                    _uiState.update {
+                        it.copy(
+                            satellite = satellite,
+                            isLoading = false
+                        )
+                    }
                     // Load satellite detail
                     loadSatelliteDetail()
                 }
@@ -54,30 +62,40 @@ class SatelliteDetailViewModel(
                         is SatelliteNotFoundException -> exception.message ?: "Satellite not found"
                         else -> "Failed to load satellite: ${exception.message}"
                     }
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = errorMessage
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = errorMessage
+                        )
+                    }
                 }
         }
     }
 
     private fun loadSatelliteDetail() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoadingDetail = true)
+            _uiState.update {
+                it.copy(
+                    isLoadingDetail = true
+                )
+            }
 
             satelliteDetailInteractor.getSatelliteDetail(args.id)
                 .onSuccess { detail ->
-                    _uiState.value = _uiState.value.copy(
-                        satelliteDetail = detail,
-                        isLoadingDetail = false
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoadingDetail = false,
+                            satelliteDetail = detail
+                        )
+                    }
                 }
                 .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoadingDetail = false,
-                        error = "Failed to load satellite detail: ${exception.message}"
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoadingDetail = false,
+                            error = "Failed to load satellite detail: ${exception.message}"
+                        )
+                    }
                 }
         }
     }
@@ -88,13 +106,18 @@ class SatelliteDetailViewModel(
             satelliteDetailInteractor.observePositionUpdates(args.id).collect { result ->
                 result
                     .onSuccess { position ->
-                        _uiState.value = _uiState.value.copy(currentPosition = position)
+                        _uiState.update {
+                            it.copy(
+                                currentPosition = position,
+                            )
+                        }
                     }
                     .onFailure { exception ->
-                        // Position updates are not critical, but we can log or show a subtle error
-                        _uiState.value = _uiState.value.copy(
-                            error = "Position update failed: ${exception.message}"
-                        )
+                        _uiState.update {
+                            it.copy(
+                                error = "Failed to get position: ${exception.message}"
+                            )
+                        }
                     }
             }
         }
