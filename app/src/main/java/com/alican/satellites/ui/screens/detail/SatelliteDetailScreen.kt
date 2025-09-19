@@ -1,49 +1,30 @@
 package com.alican.satellites.ui.screens.detail
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.alican.satellites.R
 import com.alican.satellites.data.model.Position
 import com.alican.satellites.data.model.Satellite
 import com.alican.satellites.data.model.SatelliteDetail
+import com.alican.satellites.ui.screens.detail.components.ErrorContent
+import com.alican.satellites.ui.screens.detail.components.LoadingContent
+import com.alican.satellites.ui.screens.detail.components.SatelliteDetailContent
 import com.alican.satellites.ui.theme.SatellitesTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -55,485 +36,19 @@ fun SatelliteDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = uiState.satellite?.name ?: stringResource(R.string.satellite_detail),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClicked) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        when {
-            uiState.isLoading -> {
-                LoadingContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                )
-            }
-
-            uiState.error != null -> {
-                ErrorContent(
-                    error = uiState.error.orEmpty(),
-                    onEvent = viewModel::screenEvent,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                )
-            }
-
-            uiState.satellite != null -> {
-                SatelliteDetailContent(
-                    satellite = uiState.satellite!!,
-                    satelliteDetail = uiState.satelliteDetail,
-                    currentPosition = uiState.currentPosition,
-                    isLoadingDetail = uiState.isLoadingDetail,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LoadingContent(
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.loading_satellite_details),
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
-}
-
-@Composable
-private fun ErrorContent(
-    modifier: Modifier = Modifier,
-    error: String,
-    onEvent: (SatelliteDetailUIEvent) -> Unit = {},
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.error),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = error,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            onEvent(SatelliteDetailUIEvent.ClearError)
-                        },
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    ) {
-                        Text(stringResource(R.string.go_back))
-                    }
-                    Button(
-                        onClick = {
-                            onEvent(SatelliteDetailUIEvent.RetryClicked)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onErrorContainer,
-                            contentColor = MaterialTheme.colorScheme.errorContainer
-                        )
-                    ) {
-                        Text(stringResource(R.string.retry))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SatelliteDetailContent(
-    satellite: Satellite,
-    satelliteDetail: SatelliteDetail?,
-    currentPosition: Position?,
-    isLoadingDetail: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Basic Satellite Info Card
-        SatelliteBasicInfoCard(satellite = satellite)
-
-        // Position Card
-        SatellitePositionCard(position = currentPosition)
-
-        // Detail Card
-        SatelliteDetailInfoCard(
-            satelliteDetail = satelliteDetail,
-            isLoading = isLoadingDetail
+        SatelliteDetailScreenContent(
+            uiState = uiState,
+            onBackClicked = onBackClicked
         )
     }
 }
-
-@Composable
-private fun SatelliteBasicInfoCard(
-    satellite: Satellite,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = satellite.name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                // Status Indicator
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Box(
-                        modifier = Modifier.size(12.dp)
-                    ) {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (satellite.active) Color.Green else Color.Red
-                            ),
-                            modifier = Modifier.fillMaxSize()
-                        ) {}
-                    }
-                    Text(
-                        text = stringResource(if (satellite.active) R.string.active else R.string.inactive),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.satellite_id, satellite.id),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-private fun SatellitePositionCard(
-    position: Position?,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.current_position),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                if (position != null) {
-                    // Live indicator
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier.size(8.dp)
-                        ) {
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.Green
-                                ),
-                                modifier = Modifier.fillMaxSize(),
-                                content = {}
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.live),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            if (position != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    PositionItem(
-                        label = stringResource(R.string.x_position),
-                        value = String.format("%.6f", position.posX),
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    PositionItem(
-                        label = stringResource(R.string.y_position),
-                        value = String.format("%.6f", position.posY),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.position_data_not_available),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun PositionItem(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-private fun SatelliteDetailInfoCard(
-    satelliteDetail: SatelliteDetail?,
-    isLoading: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.detailed_information),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(120.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(R.string.loading_details),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-
-                satelliteDetail != null -> {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        DetailInfoRow(
-                            label = stringResource(R.string.cost_per_launch),
-                            value = stringResource(
-                                R.string.cost_format,
-                                String.format("%,d", satelliteDetail.cost_per_launch)
-                            )
-                        )
-
-                        DetailInfoRow(
-                            label = stringResource(R.string.first_flight),
-                            value = satelliteDetail.first_flight
-                        )
-
-                        DetailInfoRow(
-                            label = stringResource(R.string.height),
-                            value = stringResource(R.string.height_format, satelliteDetail.height)
-                        )
-
-                        DetailInfoRow(
-                            label = stringResource(R.string.mass),
-                            value = stringResource(
-                                R.string.mass_format,
-                                String.format("%,d", satelliteDetail.mass)
-                            )
-                        )
-                    }
-                }
-
-                else -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.detail_information_not_available),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailInfoRow(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
-        )
-
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.End,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-// Preview Components for different states
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SatelliteDetailScreenPreview(
+private fun SatelliteDetailScreenContent(
     uiState: SatelliteDetailUiState,
     onBackClicked: () -> Unit = {},
 ) {
@@ -606,7 +121,7 @@ private val previewSatelliteDetail = SatelliteDetail(
 @Composable
 private fun SatelliteDetailScreenCompletePreview() {
     SatellitesTheme {
-        SatelliteDetailScreenPreview(
+        SatelliteDetailScreenContent(
             uiState = SatelliteDetailUiState(
                 satellite = previewSatellite,
                 satelliteDetail = previewSatelliteDetail,
@@ -623,7 +138,7 @@ private fun SatelliteDetailScreenCompletePreview() {
 @Composable
 private fun SatelliteDetailScreenLoadingPreview() {
     SatellitesTheme {
-        SatelliteDetailScreenPreview(
+        SatelliteDetailScreenContent(
             uiState = SatelliteDetailUiState(
                 satellite = null,
                 isLoading = true,
@@ -638,7 +153,7 @@ private fun SatelliteDetailScreenLoadingPreview() {
 @Composable
 private fun SatelliteDetailScreenErrorPreview() {
     SatellitesTheme {
-        SatelliteDetailScreenPreview(
+        SatelliteDetailScreenContent(
             uiState = SatelliteDetailUiState(
                 satellite = null,
                 isLoading = false,
@@ -653,7 +168,7 @@ private fun SatelliteDetailScreenErrorPreview() {
 @Composable
 private fun SatelliteDetailScreenLoadingDetailsPreview() {
     SatellitesTheme {
-        SatelliteDetailScreenPreview(
+        SatelliteDetailScreenContent(
             uiState = SatelliteDetailUiState(
                 satellite = previewSatellite,
                 satelliteDetail = null,
@@ -670,7 +185,7 @@ private fun SatelliteDetailScreenLoadingDetailsPreview() {
 @Composable
 private fun SatelliteDetailScreenNoPositionPreview() {
     SatellitesTheme {
-        SatelliteDetailScreenPreview(
+        SatelliteDetailScreenContent(
             uiState = SatelliteDetailUiState(
                 satellite = previewInactiveSatellite,
                 satelliteDetail = previewSatelliteDetail,
@@ -687,7 +202,7 @@ private fun SatelliteDetailScreenNoPositionPreview() {
 @Composable
 private fun SatelliteDetailScreenNoDetailPreview() {
     SatellitesTheme {
-        SatelliteDetailScreenPreview(
+        SatelliteDetailScreenContent(
             uiState = SatelliteDetailUiState(
                 satellite = previewSatellite,
                 satelliteDetail = null,
@@ -696,71 +211,6 @@ private fun SatelliteDetailScreenNoDetailPreview() {
                 isLoadingDetail = false,
                 error = null
             )
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Basic Info Card - Active")
-@Composable
-private fun SatelliteBasicInfoCardActivePreview() {
-    SatellitesTheme {
-        SatelliteBasicInfoCard(satellite = previewSatellite)
-    }
-}
-
-@Preview(showBackground = true, name = "Basic Info Card - Inactive")
-@Composable
-private fun SatelliteBasicInfoCardInactivePreview() {
-    SatellitesTheme {
-        SatelliteBasicInfoCard(satellite = previewInactiveSatellite)
-    }
-}
-
-@Preview(showBackground = true, name = "Position Card - With Data")
-@Composable
-private fun SatellitePositionCardWithDataPreview() {
-    SatellitesTheme {
-        SatellitePositionCard(position = previewPosition)
-    }
-}
-
-@Preview(showBackground = true, name = "Position Card - No Data")
-@Composable
-private fun SatellitePositionCardNoDataPreview() {
-    SatellitesTheme {
-        SatellitePositionCard(position = null)
-    }
-}
-
-@Preview(showBackground = true, name = "Detail Info Card - With Data")
-@Composable
-private fun SatelliteDetailInfoCardWithDataPreview() {
-    SatellitesTheme {
-        SatelliteDetailInfoCard(
-            satelliteDetail = previewSatelliteDetail,
-            isLoading = false
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Detail Info Card - Loading")
-@Composable
-private fun SatelliteDetailInfoCardLoadingPreview() {
-    SatellitesTheme {
-        SatelliteDetailInfoCard(
-            satelliteDetail = null,
-            isLoading = true
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Detail Info Card - No Data")
-@Composable
-private fun SatelliteDetailInfoCardNoDataPreview() {
-    SatellitesTheme {
-        SatelliteDetailInfoCard(
-            satelliteDetail = null,
-            isLoading = false
         )
     }
 }

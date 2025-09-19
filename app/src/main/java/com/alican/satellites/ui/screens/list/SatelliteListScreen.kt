@@ -1,6 +1,5 @@
 package com.alican.satellites.ui.screens.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,8 +42,8 @@ fun SatelliteListScreen(
 
     Surface(
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
     ) {
         SatelliteListScreenContent(
             uiState = uiState,
