@@ -4,6 +4,7 @@ import com.alican.satellites.data.model.Position
 import com.alican.satellites.data.model.Satellite
 import com.alican.satellites.data.model.SatelliteDetail
 import com.alican.satellites.data.model.SatellitePosition
+import com.alican.satellites.domain.repository.SatelliteRepository
 import kotlinx.coroutines.delay
 
 class FakeSatelliteRepository : SatelliteRepository {
