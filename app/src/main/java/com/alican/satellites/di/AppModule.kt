@@ -2,12 +2,12 @@ package com.alican.satellites.di
 
 import androidx.room.Room
 import com.alican.satellites.data.local.SatelliteDatabase
-import com.alican.satellites.data.repository.SatelliteRepository
 import com.alican.satellites.data.repository.SatelliteRepositoryImpl
 import com.alican.satellites.domain.interactor.SatelliteDetailInteractor
 import com.alican.satellites.domain.interactor.SatelliteDetailInteractorImpl
 import com.alican.satellites.domain.interactor.SatelliteListInteractor
 import com.alican.satellites.domain.interactor.SatelliteListInteractorImpl
+import com.alican.satellites.domain.repository.SatelliteRepository
 import com.alican.satellites.ui.screens.detail.SatelliteDetailViewModel
 import com.alican.satellites.ui.screens.list.SatelliteListViewModel
 import com.alican.satellites.utils.AppConstants

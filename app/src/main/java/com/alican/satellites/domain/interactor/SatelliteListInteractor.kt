@@ -1,7 +1,7 @@
 package com.alican.satellites.domain.interactor
 
 import com.alican.satellites.data.model.Satellite
-import com.alican.satellites.data.repository.SatelliteRepository
+import com.alican.satellites.domain.repository.SatelliteRepository
 import com.alican.satellites.utils.AppConstants
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow

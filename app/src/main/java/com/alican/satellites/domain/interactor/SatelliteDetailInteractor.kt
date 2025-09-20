@@ -2,8 +2,8 @@
 package com.alican.satellites.domain.interactor
 
 import com.alican.satellites.data.model.Position
-import com.alican.satellites.data.repository.SatelliteRepository
 import com.alican.satellites.domain.model.SatelliteCompleteData
+import com.alican.satellites.domain.repository.SatelliteRepository
 import com.alican.satellites.utils.AppConstants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
