@@ -1,5 +1,7 @@
 package com.alican.satellites.ui.screens.detail
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.alican.satellites.R
 import com.alican.satellites.data.model.Position
 import com.alican.satellites.data.model.Satellite
@@ -54,32 +57,31 @@ private fun SatelliteDetailScreenContent(
     onBackClicked: () -> Unit = {},
     onEvent: (SatelliteDetailUIEvent) -> Unit = {},
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = uiState.satellite?.name ?: stringResource(R.string.satellite_detail),
-                        style = MaterialTheme.typography.headlineSmall
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = uiState.satellite?.name ?: stringResource(R.string.satellite_detail),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = onBackClicked) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClicked) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
                 }
-            )
-        }
-    ) { paddingValues ->
+            }
+        )
         when {
             uiState.isLoading -> {
                 LoadingContent(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
                 )
             }
 
@@ -87,8 +89,7 @@ private fun SatelliteDetailScreenContent(
                 ErrorContent(
                     error = uiState.error,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                        .fillMaxSize(),
                     onEvent = onEvent
                 )
             }
@@ -101,11 +102,11 @@ private fun SatelliteDetailScreenContent(
                     isLoadingDetail = uiState.isLoadingDetail,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
                 )
             }
         }
     }
+
 }
 
 // Preview Data

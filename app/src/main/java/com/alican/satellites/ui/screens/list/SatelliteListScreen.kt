@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -100,16 +102,22 @@ private fun SatelliteListScreenContent(
 
             else -> {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    items(
+                    itemsIndexed(
                         items = uiState.filteredSatellites,
-                        key = { it.id }
-                    ) { satellite ->
+                        key = { index, item -> item.id }
+                    ) { index, satellite ->
                         SatelliteListItem(
                             satellite = satellite,
                             onClick = { onNavigateToDetail(satellite.id) }
                         )
+                        // just added this divider because of description of the task even tho it makes ui look kinda ugly
+                        if (index < uiState.filteredSatellites.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                            )
+                        }
                     }
                 }
             }
