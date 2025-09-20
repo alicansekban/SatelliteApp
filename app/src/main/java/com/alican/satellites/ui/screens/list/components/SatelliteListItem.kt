@@ -54,12 +54,12 @@ fun SatelliteListItem(
                     text = satellite.name,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = if (satellite.active) MaterialTheme.colorScheme.onSurface else Color.Gray
                 )
                 Text(
                     text = stringResource(R.string.satellite_id, satellite.id),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (satellite.active) MaterialTheme.colorScheme.onSurfaceVariant else Color.Gray
                 )
             }
 

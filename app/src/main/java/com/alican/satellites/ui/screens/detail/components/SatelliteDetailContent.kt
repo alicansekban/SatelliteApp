@@ -250,7 +250,8 @@ private fun SatelliteDetailInfoCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(R.string.detailed_information),
@@ -288,7 +289,9 @@ private fun SatelliteDetailInfoCard(
 
                 satelliteDetail != null -> {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         DetailInfoRow(
                             label = stringResource(R.string.cost_per_launch),
@@ -346,23 +349,21 @@ private fun DetailInfoRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
         )
+
 
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.End,
-            modifier = Modifier.weight(1f)
         )
     }
 }

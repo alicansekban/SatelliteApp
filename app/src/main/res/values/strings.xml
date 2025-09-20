@@ -26,10 +26,10 @@
     <string name="position_data_not_available">Position data not available</string>
     <string name="detailed_information">Detailed Information</string>
     <string name="loading_details">Loading details…</string>
-    <string name="cost_per_launch">Cost per Launch</string>
-    <string name="first_flight">First Flight</string>
-    <string name="height">Height</string>
-    <string name="mass">Mass</string>
+    <string name="cost_per_launch">Cost per Launch: </string>
+    <string name="first_flight">First Flight: </string>
+    <string name="height">Height: </string>
+    <string name="mass">Mass: </string>
     <string name="detail_information_not_available">Detail information not available</string>
 
     <!-- Format strings -->
