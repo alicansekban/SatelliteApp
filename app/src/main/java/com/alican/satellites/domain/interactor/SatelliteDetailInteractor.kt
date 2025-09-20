@@ -9,11 +9,23 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
+/**
+ * The SatelliteDetailInteractor is responsible for providing detailed and positional
+ * information about a specific satellite.
+ */
 
 interface SatelliteDetailInteractor {
     suspend fun getSatelliteCompleteData(satelliteId: Int): Result<SatelliteCompleteData>
     fun observePositionUpdates(satelliteId: Int): Flow<Result<Position?>>
 }
+
+/**
+ * Implementation of the SatelliteDetailInteractor interface, responsible for handling operations
+ * related to retrieving and observing the complete data and position updates of a satellite.
+ *
+ * @property repository The SatelliteRepository instance used to fetch satellite data such as basic
+ * information, details, and positions.
+ */
 
 class SatelliteDetailInteractorImpl(
     private val repository: SatelliteRepository

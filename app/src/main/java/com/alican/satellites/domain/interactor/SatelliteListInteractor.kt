@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 
+/**
+ * Interface for managing and interacting with a list of satellites.
+ * Provides methods for fetching, searching, updating, and observing satellite data.
+ */
 interface SatelliteListInteractor {
     suspend fun getSatellites(): Result<List<Satellite>>
     fun searchSatellites(satellites: List<Satellite>, query: String): List<Satellite>
@@ -19,6 +23,15 @@ interface SatelliteListInteractor {
     fun updateSatellitesList(satellites: List<Satellite>)
 
 }
+
+/**
+ * Implementation of the SatelliteListInteractor interface responsible for managing and interacting
+ * with a list of satellites. Handles operations such as fetching, searching, updating, and observing
+ * satellite data.
+ *
+ * @property repository The SatelliteRepository instance used for accessing satellite data from a
+ * data source.
+ */
 
 @OptIn(FlowPreview::class)
 class SatelliteListInteractorImpl(

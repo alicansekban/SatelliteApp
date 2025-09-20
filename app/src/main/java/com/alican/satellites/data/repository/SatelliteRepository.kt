@@ -16,13 +16,39 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 /**
- * created interface so we can use this interface to create fake repository for unit testing
+ * The SatelliteRepository interface provides methods for accessing and retrieving data
+ * related to satellites. It serves as an abstraction layer between the application
+ * logic and the data source, ensuring a clean separation of concerns.
+ *
+ * Methods in this interface include:
+ * - Fetching a list of satellites
+ * - Retrieving detailed information about a specific satellite
+ * - Obtaining position updates for satellites
+ *
+ * This repository is designed to handle asynchronous operations, and all methods are
+ * suspend functions, allowing them to be called within coroutine scopes.
  */
 interface SatelliteRepository {
     suspend fun getSatellites(): List<Satellite>
     suspend fun getSatelliteDetail(satelliteId: Int): SatelliteDetail?
     suspend fun getSatellitePositions(): List<SatellitePosition>
 }
+
+/**
+ * Implementation of the SatelliteRepository interface providing the methods for
+ * satellite data retrieval, including fetching a list of satellites, retrieving
+ * satellite details by ID, and obtaining satellite position updates.
+ *
+ * This class handles data retrieval from assets and database cache with the following strategies:
+ * - Satellite data and positions are fetched via JSON asset parsing.
+ * - Satellite detail information leverages a caching mechanism using a local database (via SatelliteDetailDao).
+ *
+ * The operations in this class run on the IO dispatcher to ensure efficient handling
+ * of file and database operations.
+ *
+ * @property context The application context used for accessing assets.
+ * @property satelliteDetailDao The DAO for interacting with the local database for satellite details.
+ */
 
 class SatelliteRepositoryImpl(
     private val context: Context,
