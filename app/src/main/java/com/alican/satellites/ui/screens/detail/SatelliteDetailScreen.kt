@@ -52,7 +52,7 @@ fun SatelliteDetailScreen(
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SatelliteDetailScreenContent(
+fun SatelliteDetailScreenContent(
     uiState: SatelliteDetailUiState,
     onBackClicked: () -> Unit = {},
     onEvent: (SatelliteDetailUIEvent) -> Unit = {},

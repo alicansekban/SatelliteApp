@@ -58,7 +58,7 @@ fun SatelliteListScreen(
     }
 }
 @Composable
-private fun SatelliteListScreenContent(
+fun SatelliteListScreenContent(
     uiState: SatelliteListUiState,
     onNavigateToDetail: (Int) -> Unit = {},
     onSearchQueryChanged: (String) -> Unit = {},
